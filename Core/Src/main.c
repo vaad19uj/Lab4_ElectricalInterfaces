@@ -72,6 +72,36 @@ static void MX_TIM3_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+void levelBubbleLED(){
+
+	if(xDegree < 1){
+		// x LED Pin low
+		HAL_GPIO_WritePin(GPIOA, xLED_Pin, GPIO_PIN_RESET);
+	}
+	else if(xDegree >= 1 && xDegree <= 5){
+		// PWM 50% duty cycle x LED
+		__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, pwm);
+
+	}
+	else{	// >5
+		// x LED Pin high
+		HAL_GPIO_WritePin(GPIOA, xLED_Pin, GPIO_PIN_SET);
+	}
+
+	if(yDegree < 1){
+		// y LED Pin low
+		HAL_GPIO_WritePin(GPIOA, yLED_Pin, GPIO_PIN_RESET);
+	}
+	else if(yDegree >= 1 && yDegree <= 5){
+		// PWM 50% duty cycle y LED
+		__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, pwm);
+	}
+	else{	// >5
+		// y LED Pin high
+		HAL_GPIO_WritePin(GPIOA, yLED_Pin, GPIO_PIN_SET);
+	}
+}
+
 void ADXL345_Write(uint8_t reg, uint8_t value){
 	uint8_t data[2];
 	data[0] = reg;
@@ -106,35 +136,6 @@ void readValues(){
 	}
 }
 
-void levelBubbleLED(){
-
-	if(xDegree < 1){
-		// x LED Pin low
-		HAL_GPIO_WritePin(GPIOA, xLED_Pin, GPIO_PIN_RESET);
-	}
-	else if(xDegree >= 1 && xDegree <= 5){
-		// PWM 50% duty cycle x LED
-		__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, pwm);
-
-	}
-	else{	// >5
-		// x LED Pin high
-		HAL_GPIO_WritePin(GPIOA, xLED_Pin, GPIO_PIN_SET);
-	}
-
-	if(yDegree < 1){
-		// y LED Pin low
-		HAL_GPIO_WritePin(GPIOA, yLED_Pin, GPIO_PIN_RESET);
-	}
-	else if(yDegree >= 1 && yDegree <= 5){
-		// PWM 50% duty cycle y LED
-		__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, pwm);
-	}
-	else{	// >5
-		// y LED Pin high
-		HAL_GPIO_WritePin(GPIOA, yLED_Pin, GPIO_PIN_SET);
-	}
-}
 
 /* USER CODE END 0 */
 
