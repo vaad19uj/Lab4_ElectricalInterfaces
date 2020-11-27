@@ -135,6 +135,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   ADXL345_Init();
+  HAL_TIM_Base_Start_IT(&htim1);	// start 5 Hz interrupt
   /* USER CODE END 2 */
 
   /* Infinite loop */
