@@ -54,6 +54,7 @@ int16_t x, y;
 int updateReady = 0;
 int xDegree = 0;
 int yDegree = 0;
+uint32_t pwm = 499;
 
 /* USER CODE END PV */
 
@@ -106,12 +107,15 @@ void readValues(){
 }
 
 void levelBubbleLED(){
+
 	if(xDegree < 1){
 		// x LED Pin low
 		HAL_GPIO_WritePin(GPIOA, xLED_Pin, GPIO_PIN_RESET);
 	}
 	else if(xDegree >= 1 && xDegree <= 5){
 		// PWM 50% duty cycle x LED
+		__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, pwm);
+
 	}
 	else{	// >5
 		// x LED Pin high
@@ -124,6 +128,7 @@ void levelBubbleLED(){
 	}
 	else if(yDegree >= 1 && yDegree <= 5){
 		// PWM 50% duty cycle y LED
+		__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, pwm);
 	}
 	else{	// >5
 		// y LED Pin high
@@ -168,7 +173,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
 	ADXL345_Init();
-	HAL_TIM_Base_Start_IT(&htim1);	// start 5 Hz interrupt
+	HAL_TIM_Base_Start_IT(&htim1);	// start timer for 5 Hz interrupt
 
 	// PWM for x and y LED
 	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
