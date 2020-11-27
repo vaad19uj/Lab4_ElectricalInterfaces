@@ -121,12 +121,21 @@ void ADXL345_Init(){
 	ADXL345_Write(0x31, 0x01);
 }
 
+int calcXDegree(){
+
+}
+
+int calcYDegree(){
+
+}
 
 void readValues(){
 	if(updateReady==1){
 		// read ADXL x and y value from register
 
 		// calculate raw values to degrees
+		calcXDegree();
+		calcYDegree();
 
 		// display result with LEDs
 		levelBubbleLED();
