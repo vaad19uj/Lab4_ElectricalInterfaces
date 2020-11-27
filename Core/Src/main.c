@@ -91,6 +91,10 @@ void ADXL345_Init(){
 void readValues(){
 	if(updateReady==1){
 		// read ADXL x and y value
+
+
+		// reset
+		updateReady = 0;
 	}
 }
 
@@ -391,6 +395,11 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 
 // 5Hz update
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
+	if(htim->instance == TIM1){
+		updateReady = 1;
+	}
+}
 
 // calibrate button
 
