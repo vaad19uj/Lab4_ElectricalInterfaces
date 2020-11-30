@@ -54,7 +54,8 @@ int16_t x, y;
 int updateReady = 0;
 int xDegree = 0;
 int yDegree = 0;
-uint32_t pwm = 499;
+uint32_t pwm = 0;
+
 
 /* USER CODE END PV */
 
@@ -76,29 +77,33 @@ void levelBubbleLED(){
 
 	if(xDegree < 1){
 		// x LED Pin low
-		HAL_GPIO_WritePin(GPIOA, xLED_Pin, GPIO_PIN_RESET);
+		pwm=0;
+		__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, pwm);
 	}
 	else if(xDegree >= 1 && xDegree <= 5){
-		// PWM 50% duty cycle x LED
+		pwm=99;
 		__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, pwm);
 
 	}
 	else{	// >5
 		// x LED Pin high
-		HAL_GPIO_WritePin(GPIOA, xLED_Pin, GPIO_PIN_SET);
+		pwm=999;
+		__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, pwm);
 	}
 
 	if(yDegree < 1){
 		// y LED Pin low
-		HAL_GPIO_WritePin(GPIOA, yLED_Pin, GPIO_PIN_RESET);
+		pwm=0;
+		__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, pwm);
 	}
 	else if(yDegree >= 1 && yDegree <= 5){
-		// PWM 50% duty cycle y LED
+		pwm=99;
 		__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, pwm);
 	}
 	else{	// >5
 		// y LED Pin high
-		HAL_GPIO_WritePin(GPIOA, yLED_Pin, GPIO_PIN_SET);
+		pwm=999;
+		__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, pwm);
 	}
 }
 
@@ -121,12 +126,12 @@ void ADXL345_Init(){
 	ADXL345_Write(0x31, 0x01);
 }
 
-int calcXDegree(){
-
+void calcXDegree(){
+	xDegree = 0;
 }
 
-int calcYDegree(){
-
+void calcYDegree(){
+	yDegree = 2;
 }
 
 void readValues(){
@@ -463,6 +468,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 	if(GPIO_Pin == B1_Pin){
 		// compensate for offset
+
+		//test interrupt
+		HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, SET);
+
 	}
 }
 
