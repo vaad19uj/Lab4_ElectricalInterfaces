@@ -50,8 +50,9 @@ UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
 uint8_t data_rec[6];
-int16_t x, y;
-int updateReady = 0;
+int16_t x, y, z;
+int updateReady = 0;	// flag
+int offset = 0;
 int xDegree = 0;
 int yDegree = 0;
 uint32_t pwm = 0;
@@ -72,6 +73,17 @@ static void MX_TIM3_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+void ADXL345_SetOffset(uint8_t x, uint8_t y, uint8_t z){
+	ADXL345_Write(0x1E, x);
+	HAL_Delay(10);
+	ADXL345_Write(0x1F, y);
+	HAL_Delay(10);
+	ADXL345_Write(0x20, z);
+	HAL_Delay(10);
+
+	offset=0;
+}
 
 void levelBubbleLED(){
 
@@ -136,7 +148,22 @@ void calcYDegree(){
 
 void readValues(){
 	if(updateReady==1){
-		// read ADXL x and y value from register
+		// read ADXL x and y values from register
+		ADXL345_Read(0x32, 6);
+
+		x=(data_rec[1]<<8 | data_rec[0]);
+		y=(data_rec[3]<<8 | data_rec[2]);
+		z=(data_rec[5]<<8 | data_rec[4]);
+
+		//convert to g
+		x=x*0.0078;
+		y=y*0.0078;
+		z=z*0.0078;
+
+		// calibrate
+		if(offset == 1){
+			ADXL345_SetOffset((-x/4), (-y/4), (-z/4));
+		}
 
 		// calculate raw values to degrees
 		calcXDegree();
@@ -467,10 +494,11 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 // calibrate button
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 	if(GPIO_Pin == B1_Pin){
-		// compensate for offset
+		// set offset flag
+		offset = 1;
 
 		//test interrupt
-		HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, SET);
+		//HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, SET);
 
 	}
 }
