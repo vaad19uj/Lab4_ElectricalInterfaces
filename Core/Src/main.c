@@ -22,7 +22,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <math.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -74,16 +74,6 @@ static void MX_TIM3_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-void ADXL345_SetOffset(uint8_t x, uint8_t y, uint8_t z){
-	ADXL345_Write(0x1E, x);
-	HAL_Delay(10);
-	ADXL345_Write(0x1F, y);
-	HAL_Delay(10);
-	ADXL345_Write(0x20, z);
-	HAL_Delay(10);
-
-	offset=0;
-}
 
 void levelBubbleLED(){
 
@@ -138,12 +128,26 @@ void ADXL345_Init(){
 	ADXL345_Write(0x31, 0x01);
 }
 
+void ADXL345_SetOffset(uint8_t x, uint8_t y, uint8_t z){
+	ADXL345_Write(0x1E, x);
+	HAL_Delay(10);
+	ADXL345_Write(0x1F, y);
+	HAL_Delay(10);
+	ADXL345_Write(0x20, z);
+	HAL_Delay(10);
+
+	offset=0;
+}
+
 void calcXDegree(){
-	xDegree = 0;
+	xDegree = atan(x/sqrt(pow(y, 2) + pow(z, 2))) *180/M_PI;
+	xDegree = abs(xDegree);
 }
 
 void calcYDegree(){
-	yDegree = 2;
+	//yDegree = atan(y/sqrt(pow(x, 2) + pow(z, 2))) *180/M_PI;
+	//yDegree = abs(yDegree);
+	yDegree = 0;
 }
 
 void readValues(){
@@ -156,9 +160,9 @@ void readValues(){
 		z=(data_rec[5]<<8 | data_rec[4]);
 
 		//convert to g???
-		x=x*0.0078;
-		y=y*0.0078;
-		z=z*0.0078;
+		//x=x*0.0078;
+		//y=y*0.0078;
+		//z=z*0.0078;
 
 		// calibrate
 		if(offset == 1){
@@ -498,7 +502,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 		offset = 1;
 
 		//test interrupt
-		//HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, SET);
+		HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, SET);
 
 	}
 }
