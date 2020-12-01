@@ -155,7 +155,7 @@ void readValues(){
 		y=(data_rec[3]<<8 | data_rec[2]);
 		z=(data_rec[5]<<8 | data_rec[4]);
 
-		//convert to g
+		//convert to g???
 		x=x*0.0078;
 		y=y*0.0078;
 		z=z*0.0078;
