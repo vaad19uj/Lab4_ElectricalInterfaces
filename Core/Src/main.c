@@ -51,6 +51,7 @@ UART_HandleTypeDef huart2;
 /* USER CODE BEGIN PV */
 uint8_t data_rec[6];
 int16_t x, y, z;
+double xg, yg, zg;
 int updateReady = 0;	// flag
 int offset = 0;
 int xDegree = 0;
@@ -129,6 +130,7 @@ void ADXL345_Init(){
 }
 
 void ADXL345_SetOffset(uint8_t x, uint8_t y, uint8_t z){
+	// write values to offset registers
 	ADXL345_Write(0x1E, x);
 	HAL_Delay(10);
 	ADXL345_Write(0x1F, y);
@@ -140,14 +142,15 @@ void ADXL345_SetOffset(uint8_t x, uint8_t y, uint8_t z){
 }
 
 void calcXDegree(){
-	xDegree = atan(x/sqrt(pow(y, 2) + pow(z, 2))) *180/M_PI;
-	xDegree = abs(xDegree);
+	xDegree = (atan2(xg, sqrt(pow(yg, 2) + pow(zg, 2))) *180)/M_PI;
+	//xDegree = abs(xCalc);
 }
 
 void calcYDegree(){
-	//yDegree = atan(y/sqrt(pow(x, 2) + pow(z, 2))) *180/M_PI;
-	//yDegree = abs(yDegree);
-	yDegree = 0;
+	//yDegree = (atan2(yg, sqrt(pow(xg, 2) + pow(zg, 2))) *180)/M_PI;
+	//yDegree = abs(yCalc);
+
+	yDegree=0;
 }
 
 void readValues(){
@@ -159,17 +162,17 @@ void readValues(){
 		y=(data_rec[3]<<8 | data_rec[2]);
 		z=(data_rec[5]<<8 | data_rec[4]);
 
-		//convert to g???
-		//x=x*0.0078;
-		//y=y*0.0078;
-		//z=z*0.0078;
-
 		// calibrate
 		if(offset == 1){
 			ADXL345_SetOffset((-x/4), (-y/4), (-z/4));
 		}
 
-		// calculate raw values to degrees
+		//convert to g
+		xg=x*0.0078;
+		yg=y*0.0078;
+		zg=z*0.0078;
+
+		// calculate g values to degrees
 		calcXDegree();
 		calcYDegree();
 
@@ -221,7 +224,7 @@ int main(void)
 	ADXL345_Init();
 	HAL_TIM_Base_Start_IT(&htim1);	// start timer for 5 Hz interrupt
 
-	// PWM for x and y LED
+	// Start PWM timer for x and y LED
 	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
 	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
 
@@ -502,8 +505,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 		offset = 1;
 
 		//test interrupt
-		HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, SET);
-
+		//HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, SET);
 	}
 }
 
